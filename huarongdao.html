@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3x3 Sliding Puzzle</title>
+    <style>
+        .puzzle-container {
+            display: inline-block;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .puzzle {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 2px;
+            background-color: #333;
+            padding: 2px;
+        }
+        .tile {
+            background-color: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .tile:hover {
+            background-color: #45a049;
+        }
+        .empty {
+            background-color: #f0f0f0;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="puzzle-container">
+        <div id="puzzle" class="puzzle"></div>
+        <button onclick="shufflePuzzle()">Shuffle</button>
+    </div>
+
+    <script>
+        let tiles = [1, 2, 3, 4, 5, 6, 7, 8, null];
+        let emptyPos = 8;
+
+        function createPuzzle() {
+            const puzzleDiv = document.getElementById('puzzle');
+            puzzleDiv.innerHTML = '';
+            tiles.forEach((num, index) => {
+                const tile = document.createElement('div');
+                tile.className = num ? 'tile' : 'tile empty';
+                tile.textContent = num || '';
+                tile.onclick = () => moveTile(index);
+                puzzleDiv.appendChild(tile);
+            });
+        }
+
+        function moveTile(index) {
+            if (isAdjacent(index, emptyPos)) {
+                tiles[emptyPos] = tiles[index];
+                tiles[index] = null;
+                emptyPos = index;
+                createPuzzle();
+                checkWin();
+            }
+        }
+
+        function isAdjacent(pos1, pos2) {
+            const row1 = Math.floor(pos1 / 3);
+            const col1 = pos1 % 3;
+            const row2 = Math.floor(pos2 / 3);
+            const col2 = pos2 % 3;
+            return Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1;
+        }
+
+        function shufflePuzzle() {
+            for (let i = 0; i < 100; i++) {
+                const adjacentPositions = [];
+                for (let j = 0; j < 9; j++) {
+                    if (isAdjacent(j, emptyPos)) {
+                        adjacentPositions.push(j);
+                    }
+                }
+                const randomPos = adjacentPositions[Math.floor(Math.random() * adjacentPositions.length)];
+                moveTile(randomPos);
+            }
+        }
+
+        function checkWin() {
+            const solution = [1, 2, 3, 4, 5, 6, 7, 8, null];
+            if (tiles.every((tile, index) => tile === solution[index])) {
+                setTimeout(() => alert('Congratulations! You won!'), 100);
+            }
+        }
+
+        createPuzzle();
+    </script>
+</body>
+</html>
